@@ -6,12 +6,14 @@
 
 ## Scripts
 
-| Script | Cloud | Output File |
-|---|---|---|
-| `azure_unmanaged_vms_export.py` | Azure | `azure_unmanaged_running_vms.csv` |
-| `aws_unmanaged_vms_export.py` | AWS | `aws_unmanaged_running_vms.csv` |
+All scripts query the Falcon Asset Explorer for instances that are **unmanaged** (no CrowdStrike sensor) and currently **running**.
 
-Both scripts query the Falcon Asset Explorer for instances that are **unmanaged** (no CrowdStrike sensor) and currently **running**, then write the full asset details to CSV.
+| Script | Cloud | Columns | Output File |
+|---|---|---|---|
+| `azure_unmanaged_vms_export.py` | Azure | All fields | `azure_unmanaged_running_vms.csv` |
+| `aws_unmanaged_vms_export.py` | AWS | All fields | `aws_unmanaged_running_vms.csv` |
+| `azure_unmanaged_vms_summary.py` | Azure | `instance_id`, `account_id` | `azure_unmanaged_running_vms_summary.csv` |
+| `aws_unmanaged_vms_summary.py` | AWS | `instance_id`, `account_id` | `aws_unmanaged_running_vms_summary.csv` |
 
 ---
 
