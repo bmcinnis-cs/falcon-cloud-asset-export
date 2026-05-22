@@ -26,7 +26,21 @@ See [docs/asset_explorer_export_guide.md](docs/asset_explorer_export_guide.md) f
 
 ## Quick Start
 
-**1. Install dependencies**
+**1. Create and activate a virtual environment**
+
+```bash
+python -m venv .venv
+```
+
+| Platform | Activation command |
+|---|---|
+| macOS / Linux | `source .venv/bin/activate` |
+| Windows (cmd) | `.venv\Scripts\activate.bat` |
+| Windows (PowerShell) | `.venv\Scripts\Activate.ps1` |
+
+You'll see `(.venv)` in your terminal prompt once active. You need to activate the virtual environment each time you open a new terminal session before running the scripts.
+
+**2. Install dependencies**
 
 ```bash
 pip install crowdstrike-falconpy python-dotenv
