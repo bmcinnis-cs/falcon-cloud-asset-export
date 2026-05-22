@@ -1,12 +1,8 @@
 import csv
-import json
 import os
 from dotenv import load_dotenv
 from falconpy import OAuth2, CloudSecurityAssets
 
-# managed_by:'Unmanaged' + cloud_provider:'azure' + instance_state:'running'
-# Adjust these values if the API returns no results — FQL values are case-sensitive
-# and must match what the platform stores (e.g. 'azure' vs 'Azure', 'running' vs 'VM running').
 FILTER = "managed_by:'Unmanaged'+cloud_provider:'azure'+instance_state:'running'"
 OUTPUT_FILE = "azure_unmanaged_running_vms.csv"
 
@@ -43,14 +39,13 @@ def write_csv(assets):
     if not assets:
         print("No assets found matching the filter.")
         return
-    fieldnames = list(assets[0].keys())
     with open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
+        writer = csv.DictWriter(f, fieldnames=["resource_id", "account_id"])
         writer.writeheader()
         for asset in assets:
             writer.writerow({
-                k: json.dumps(v) if isinstance(v, (dict, list)) else v
-                for k, v in asset.items()
+                "resource_id": asset.get("resource_id", ""),
+                "account_id": asset.get("account_id", ""),
             })
     print(f"Wrote {len(assets)} row(s) to {OUTPUT_FILE}")
 
