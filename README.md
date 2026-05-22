@@ -8,10 +8,6 @@ Python scripts for exporting cloud security asset data from the CrowdStrike Falc
 |---|---|---|
 | `azure_unmanaged_vms_export.py` | Unmanaged running VMs — Azure | `azure_unmanaged_running_vms.csv` |
 | `aws_unmanaged_vms_export.py` | Unmanaged running VMs — AWS | `aws_unmanaged_running_vms.csv` |
-| `unmanaged_hosts.py` | Host coverage summary via Falcon Discover | stdout |
-| `cspm_aws_policies.py` | All AWS CSPM policy definitions | stdout |
-| `compliance_violations.py` | Active compliance violation counts by rule | stdout |
-| `unused_identity_assets.py` | Unused identity assets with cloud risks | stdout |
 
 ## Setup & Usage
 
@@ -36,9 +32,6 @@ python aws_unmanaged_vms_export.py
 
 ## Required API Scopes
 
-| Scope | Access | Used by |
-|---|---|---|
-| Cloud Security Assets | Read | `azure_unmanaged_vms_export.py`, `aws_unmanaged_vms_export.py` |
-| Hosts | Read | `unmanaged_hosts.py` |
-| Alerts | Read | `compliance_violations.py` |
-| Cloud Security Posture Management | Read | `cspm_aws_policies.py`, `unused_identity_assets.py` |
+| Scope | Access |
+|---|---|
+| Cloud Security Assets | Read |
