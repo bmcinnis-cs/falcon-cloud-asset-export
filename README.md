@@ -20,9 +20,7 @@ All scripts query the Falcon Asset Explorer for instances that are **unmanaged**
 ## Prerequisites
 
 - Python 3.8+
-- A CrowdStrike Falcon API client with :
-
-**Cloud Security Assets: Read** scope
+- CrowdStrike Falcon API client with **Cloud Security Assets: Read** scope
 
 See [docs/asset_explorer_export_guide.md](docs/asset_explorer_export_guide.md) for step-by-step instructions on installing Python, creating an API client, and configuring credentials.
 
