@@ -6,14 +6,13 @@
 
 ## Scripts
 
-All scripts query the Falcon Asset Explorer for instances that are **unmanaged** (no CrowdStrike sensor) and currently **running**.
+All scripts query the Falcon Asset Explorer for instances that are **unmanaged** (no CrowdStrike sensor) and currently **running**, outputting two columns: `resource_id` and `account_id`.
 
-| Script | Cloud | Columns | Output File |
-|---|---|---|---|
-| `azure_unmanaged_vms_export.py` | Azure | All fields | `azure_unmanaged_running_vms.csv` |
-| `aws_unmanaged_vms_export.py` | AWS | All fields | `aws_unmanaged_running_vms.csv` |
-| `azure_unmanaged_vms_summary.py` | Azure | `instance_id`, `account_id` | `azure_unmanaged_running_vms_summary.csv` |
-| `aws_unmanaged_vms_summary.py` | AWS | `instance_id`, `account_id` | `aws_unmanaged_running_vms_summary.csv` |
+| Script | Cloud | Output File |
+|---|---|---|
+| `azure_unmanaged_vms_export.py` | Azure | `azure_unmanaged_running_vms.csv` |
+| `aws_unmanaged_vms_export.py` | AWS | `aws_unmanaged_running_vms.csv` |
+| `gcp_unmanaged_vms_export.py` | GCP | `gcp_unmanaged_running_vms.csv` |
 
 ---
 
@@ -48,7 +47,7 @@ You'll see `(.venv)` in your terminal prompt once active. You need to activate t
 pip install crowdstrike-falconpy python-dotenv
 ```
 
-**2. Configure credentials**
+**3. Configure credentials**
 
 ```bash
 cp .env.example .env
@@ -61,20 +60,26 @@ FALCON_CLIENT_ID=your_client_id_here
 FALCON_CLIENT_SECRET=your_client_secret_here
 ```
 
-**3. Run**
+**4. Run**
 
 ```bash
 python azure_unmanaged_vms_export.py
 python aws_unmanaged_vms_export.py
+python gcp_unmanaged_vms_export.py
 ```
 
 ---
 
 ## Output
 
-Each script produces a CSV file where every row is one cloud asset. Nested fields (e.g. `cloud_risks`, `tags`) are serialized as JSON strings within their column.
+Each script produces a CSV with two columns per asset:
 
-Key columns include: `resource_name`, `account_id`, `region`, `instance_state`, `managed_by`, `publicly_exposed`, `first_seen`, `updated_at`.
+| Column | Description |
+|---|---|
+| `resource_id` | The cloud resource identifier for the VM |
+| `account_id` | The cloud account / subscription the VM belongs to |
+
+> **Note:** If opening in Excel, use **Data → From Text/CSV** and set `account_id` to **Text** type during import to prevent large account IDs from being displayed in scientific notation.
 
 ---
 
