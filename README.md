@@ -1,37 +1,67 @@
 # Falcon Cloud Asset Export
 
-Python scripts for exporting cloud security asset data from the CrowdStrike Falcon platform using the [FalconPy SDK](https://github.com/CrowdStrike/falconpy).
+> Python scripts for exporting unmanaged running VM data from [CrowdStrike Falcon Cloud Security](https://www.crowdstrike.com/platform/cloud-security/) using the [FalconPy SDK](https://github.com/CrowdStrike/falconpy).
+
+---
 
 ## Scripts
 
-| Script | Description | Output |
+| Script | Cloud | Output File |
 |---|---|---|
-| `azure_unmanaged_vms_export.py` | Unmanaged running VMs — Azure | `azure_unmanaged_running_vms.csv` |
-| `aws_unmanaged_vms_export.py` | Unmanaged running VMs — AWS | `aws_unmanaged_running_vms.csv` |
+| `azure_unmanaged_vms_export.py` | Azure | `azure_unmanaged_running_vms.csv` |
+| `aws_unmanaged_vms_export.py` | AWS | `aws_unmanaged_running_vms.csv` |
 
-## Setup & Usage
+Both scripts query the Falcon Asset Explorer for instances that are **unmanaged** (no CrowdStrike sensor) and currently **running**, then write the full asset details to CSV.
 
-See [docs/asset_explorer_export_guide.md](docs/asset_explorer_export_guide.md) for full setup instructions including:
+---
 
-- Python installation (macOS, Windows, Linux)
-- Installing dependencies
-- Creating a Falcon API client with the correct scopes
-- Configuring credentials
-- Running the scripts
-- Troubleshooting
+## Prerequisites
+
+- Python 3.8+
+- A CrowdStrike Falcon API client with the **Cloud Security Assets: Read** scope
+
+See [docs/asset_explorer_export_guide.md](docs/asset_explorer_export_guide.md) for step-by-step instructions on installing Python, creating an API client, and configuring credentials.
+
+---
 
 ## Quick Start
 
+**1. Install dependencies**
+
 ```bash
 pip install crowdstrike-falconpy python-dotenv
+```
+
+**2. Configure credentials**
+
+```bash
 cp .env.example .env
-# Edit .env with your Falcon API credentials
+```
+
+Edit `.env` with your Falcon API Client ID and Secret:
+
+```ini
+FALCON_CLIENT_ID=your_client_id_here
+FALCON_CLIENT_SECRET=your_client_secret_here
+```
+
+**3. Run**
+
+```bash
 python azure_unmanaged_vms_export.py
 python aws_unmanaged_vms_export.py
 ```
 
-## Required API Scopes
+---
 
-| Scope | Access |
-|---|---|
-| Cloud Security Assets | Read |
+## Output
+
+Each script produces a CSV file where every row is one cloud asset. Nested fields (e.g. `cloud_risks`, `tags`) are serialized as JSON strings within their column.
+
+Key columns include: `resource_name`, `account_id`, `region`, `instance_state`, `managed_by`, `publicly_exposed`, `first_seen`, `updated_at`.
+
+---
+
+## Documentation
+
+Full setup and troubleshooting guide: [docs/asset_explorer_export_guide.md](docs/asset_explorer_export_guide.md)
