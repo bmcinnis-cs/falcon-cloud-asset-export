@@ -45,7 +45,7 @@ def write_csv(assets):
         for asset in assets:
             writer.writerow({
                 "resource_id": asset.get("resource_id", ""),
-                "account_id": asset.get("account_id", ""),
+                "account_id": "\t" + str(asset.get("account_id", "")),
             })
     print(f"Wrote {len(assets)} row(s) to {OUTPUT_FILE}")
 
