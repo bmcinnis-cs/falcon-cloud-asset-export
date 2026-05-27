@@ -1,17 +1,53 @@
 import csv
 import os
 from dotenv import load_dotenv
-from falconpy import OAuth2, CloudSecurityAssets
+from falconpy import OAuth2, CloudSecurity, CloudSecurityAssets
 
-FILTER = "managed_by:'Unmanaged'+cloud_provider:'aws'+instance_state:'running'"
+BASE_FILTER = "managed_by:'Unmanaged'+cloud_provider:'aws'+instance_state:'running'"
 OUTPUT_FILE = "aws_unmanaged_running_vms.csv"
 
 
-def query_all_ids(sdk):
+def resolve_group_fql(cs_sdk, name):
+    r = cs_sdk.list_group_ids(filter=f"name:'{name}'")
+    group_ids = r["body"].get("resources") or []
+    if not group_ids:
+        raise RuntimeError(f"Cloud group '{name}' not found.")
+    r2 = cs_sdk.list_cloud_groups_by_id(ids=group_ids)
+    group = (r2["body"].get("resources") or [{}])[0]
+    terms = []
+    for selector in (group.get("selectors") or {}).get("cloud_resources") or []:
+        account_ids = selector.get("account_ids") or []
+        if account_ids:
+            joined = ",".join(f"'{a}'" for a in account_ids)
+            terms.append(f"account_id:[{joined}]")
+        for tag_str in (selector.get("filters") or {}).get("tags") or []:
+            if "=" in tag_str:
+                key, _, value = tag_str.partition("=")
+                terms.append(f"tag_key:'{key}'")
+                terms.append(f"tag_value:'{value}'")
+            else:
+                terms.append(f"tag_key:'{tag_str}'")
+    return terms
+
+
+def build_filter(group_terms=None):
+    f = BASE_FILTER
+    tag_key = os.environ.get("FALCON_CLOUD_TAG_KEY")
+    if tag_key:
+        f += f"+tag_key:'{tag_key}'"
+    tag_value = os.environ.get("FALCON_CLOUD_TAG_VALUE")
+    if tag_value:
+        f += f"+tag_value:'{tag_value}'"
+    if group_terms:
+        f += "+" + "+".join(group_terms)
+    return f
+
+
+def query_all_ids(sdk, fql):
     ids = []
     after = None
     while True:
-        params = {"limit": 1000, "filter": FILTER}
+        params = {"limit": 1000, "filter": fql}
         if after:
             params["after"] = after
         r = sdk.query_assets(**params)
@@ -57,10 +93,18 @@ if __name__ == "__main__":
         client_secret=os.environ["FALCON_CLIENT_SECRET"],
         base_url=os.environ.get("FALCON_BASE_URL", "https://api.crowdstrike.com"),
     )
-    sdk = CloudSecurityAssets(auth_object=auth)
+    csa = CloudSecurityAssets(auth_object=auth)
 
-    print(f"Querying: {FILTER}")
-    ids = query_all_ids(sdk)
+    group_terms = []
+    group = os.environ.get("FALCON_CLOUD_GROUP")
+    if group:
+        cs = CloudSecurity(auth_object=auth)
+        group_terms = resolve_group_fql(cs, group)
+        print(f"Group '{group}' resolved to FQL terms: {group_terms}")
+
+    fql = build_filter(group_terms)
+    print(f"Querying: {fql}")
+    ids = query_all_ids(csa, fql)
     print(f"Found {len(ids)} asset ID(s). Fetching details...")
-    assets = fetch_assets(sdk, ids)
+    assets = fetch_assets(csa, ids)
     write_csv(assets)
